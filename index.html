@@ -12,13 +12,16 @@
     --warn:#b7791f; --warn-soft:#fbefd5; --head:#1c1c1a; --head-muted:#6b6a64;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#151513; --card:rgba(31,31,28,.9); --ink:#f1efe8; --muted:#9b998f; --line:#34332e;
+    :root{ --bg:#151513; --card:rgba(22,22,20,.74); --ink:#f1efe8; --muted:#9b998f; --line:#34332e;
       --accent:#e07a52; --accent-soft:#3a251c; --ok:#5cc489; --ok-soft:#1b3326;
       --warn:#f0b54a; --warn-soft:#3a2c12; --head:#f1efe8; --head-muted:#b9b7ad; }
   }
   /* Thursday: a different accent for the last day of the week */
   body.thu{ --accent:#6b4fd8; --accent-soft:#e9e3fb; }
-  @media (prefers-color-scheme: dark){ body.thu{ --accent:#a993ff; --accent-soft:#2a2342; } }
+  @media (prefers-color-scheme: dark){
+    body.thu{ --accent:#a993ff; --accent-soft:#2a2342; }
+    body.thu button:not(.copied){ color:#1a1433; }   /* light purple needs dark text */
+  }
 
   *{box-sizing:border-box}
   html{background:var(--bg)}
@@ -158,8 +161,9 @@
   var SKY = {
     light: [ [0,'#9fd3f7','#eef7fd'], [.4,'#5fb2ee','#dff0fb'], [.75,'#f3c07e','#fdeedb'],
              [.97,'#ec7a50','#f8c795'], [1,'#6a5a9c','#e9907a'] ],
-    dark:  [ [0,'#1d3550','#141c26'], [.4,'#1e4a72','#15212d'], [.75,'#5a3d22','#1d1712'],
-             [.97,'#6b2e1c','#1f1410'], [1,'#2c2347','#191420'] ]
+    // Night-friendly but saturated: deep colours that still read clearly as morning / noon / sunset / dusk
+    dark:  [ [0,'#2f6aa3','#122233'], [.4,'#2a7fca','#10263a'], [.75,'#b8692a','#2a1a0e'],
+             [.97,'#c2452a','#2e120c'], [1,'#5a3fb0','#1c1433'] ]
   };
   function hex2rgb(h){ return [parseInt(h.substr(1,2),16), parseInt(h.substr(3,2),16), parseInt(h.substr(5,2),16)]; }
   function mix(a, b, t){
@@ -187,7 +191,9 @@
       return;
     }
     var s = skyAt(p);
-    root.background = 'linear-gradient(180deg,' + rgb(s[0]) + ' 0%,' + rgb(s[1]) + ' 70%)';
+    // In dark mode stretch the colour further down the screen so it isn't swallowed by black
+    var end = (darkMQ && darkMQ.matches) ? '100%' : '70%';
+    root.background = 'linear-gradient(180deg,' + rgb(s[0]) + ' 0%,' + rgb(s[1]) + ' ' + end + ')';
     root.backgroundAttachment = 'fixed';
     var lightHead = lum(s[0]) < 0.55;          // header text sits on the top colour
     root.setProperty('--head', lightHead ? '#ffffff' : '#1c1c1a');
